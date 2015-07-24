@@ -1,28 +1,27 @@
 ## Put comments here that give an overall description of what your
 ## functions do
 
-## Write a short comment describing this function
 ## This function creates a special "matrix" object that can cache its inverse.
-## in reality this retuns a list of the four functions that are the "methods" of the object
+## in reality this retuns a list of the three functions that are the "methods"
+## of the matrix object object, get() , set() and getinverse()
 makeCacheMatrix <- function(x = matrix()) {
         
-        solution <- NULL # 'solution' is the cached matrix inverse
-        
+        solution <- NULL # 'solution' is the matrix' inverse
+
+        get <- function () x # this simply returns the matrix contents       
+                
         set <- function(y=matrix()){
-                x <<- y         # this method sets the matrix directly 
-                solution <<- NULL      # and therefore overwrites the cache    
+                x <<- y                 # this method sets the matrix contents directly 
+                solution <<- NULL       # and therefore clears the cached solution    
         }
         
-        get <- function () x # this simply returns the matrix
+        # sets the inverse of the matrix
+        setinverse <- function(solve) solution <<- solve
         
-        # gets the inverse of the matrix
-        getinverse <- function(){
-                        if(is.null(solution)){
-                        solution <- solve(x)
-                        }
-        }
+        # simlpy returns the matrix' inverse
+        getinverse <- function() solution
         
-        list(set = set, get = get, getinverse = getinverse)
+        list(set = set, get = get, setinverse = setinverse, getinverse = getinverse)
 }
 
 
@@ -32,9 +31,13 @@ makeCacheMatrix <- function(x = matrix()) {
 ## then the cachesolve should retrieve the inverse from the cache.
 cacheSolve <- function(x, ...) {
         ## Return a matrix that is the inverse of 'x'
-        m <<- solution
-        if(!is.null(m)) {
+        result <- x$getinverse()
+        if(!is.null(result)) {
                 message("getting cached data")
-                return(x$getinverse)
+                return(result)
         }
+        data <- x$get()
+        solution <- solve(data, ...)
+        x$setinverse(solution)
+        solution
 }
